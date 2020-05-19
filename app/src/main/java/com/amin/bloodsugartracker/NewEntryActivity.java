@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class NewEntryActivity extends AppCompatActivity
@@ -47,6 +49,10 @@ public class NewEntryActivity extends AppCompatActivity
 	private File filename;
 	private FileOutputStream fos;
 
+	private String dateCreatedString;
+	private Date dateCreated;
+	private long dateCreatedFinal = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -54,6 +60,8 @@ public class NewEntryActivity extends AppCompatActivity
 		setContentView(R.layout.bloodsugar_entry);
 
 		entryDate = findViewById(R.id.date_entry);
+		entryDate.setMaxDate(new Date().getTime());
+
 		entryTime = findViewById(R.id.time_entry);
 		//entryFasting = findViewById(R.id.fasting_confirmation_entry);
 		entryGlucoseLevel = findViewById(R.id.blood_glucose_level_entry);
@@ -134,6 +142,19 @@ public class NewEntryActivity extends AppCompatActivity
 			time = entryHour + ":" + entryMinute + " " + ampmIndicator;
 		}
 
+//		dateCreatedString = entryYear + "/" + entryMonth + "/" + entryDay + " " + entryTime.getHour() + ":" + entryMinute;
+//		SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+//		try
+//		{
+//			dateCreated = s.parse(dateCreatedString);
+//			dateCreatedFinal = dateCreated.getTime();
+//		}
+//		catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+
+
 //		entryFasting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
 //		{
 //			@Override
@@ -168,6 +189,17 @@ public class NewEntryActivity extends AppCompatActivity
 			{
 				if(!(entryGlucoseLevel.getText().toString().equals("")) && !(statusDesc.equals("NONE")))
 				{
+					dateCreatedString = entryYear + "/" + entryMonth + "/" + entryDay + " " + entryTime.getHour() + ":" + entryMinute;
+					SimpleDateFormat s = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+					try
+					{
+						dateCreated = s.parse(dateCreatedString);
+						dateCreatedFinal = dateCreated.getTime();
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 					new AlertDialog.Builder(NewEntryActivity.this)
 							.setTitle("Confirm Entry")
 							.setMessage("Entry Date: " + date + "\nEntry Time: " + time + "\nCondition: " + statusDesc + "\nBlood Glucose Level: " + Double.parseDouble(entryGlucoseLevel.getText().toString()) + " mmol/L")
@@ -183,6 +215,7 @@ public class NewEntryActivity extends AppCompatActivity
 										fos = openFileOutput(filename.getName(), Context.MODE_PRIVATE);
 										fos.write((date + "#" + time + "#" + statusDesc + "#" + Double.parseDouble(entryGlucoseLevel.getText().toString())).getBytes());
 										fos.close();
+										filename.setLastModified(dateCreatedFinal);
 										Toast.makeText(NewEntryActivity.this, "Entry has been created.", Toast.LENGTH_SHORT).show();
 										startActivity(new Intent(NewEntryActivity.this, HomeActivity.class));
 										finish();

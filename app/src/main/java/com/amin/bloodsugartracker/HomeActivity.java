@@ -20,6 +20,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 // app icon shape src = http://clipart-library.com/clipart/BcaonGRc8.htm
 
@@ -63,6 +65,19 @@ public class HomeActivity extends AppCompatActivity
 
 		f = new File(getFilesDir().toString());
 		ff = f.listFiles();
+
+		Arrays.sort(ff, new Comparator<File>()
+		{
+			public int compare(File a, File b)
+			{
+				if(a.lastModified() < b.lastModified())
+					return 1;
+				else if(a.lastModified() > b.lastModified())
+					return -1;
+				else
+					return 0;
+			}
+		});
 
 		if(ff != null)
 		{
